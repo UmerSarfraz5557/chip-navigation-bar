@@ -103,6 +103,33 @@ class ChipNavigationBar @JvmOverloads constructor(
 
 
 
+    fun setMenuResource(@MenuRes menuRes: Int , backgroundColor : Int) {
+        this.menuRes = menuRes
+
+        val menu = (MenuParser(context).parse(menuRes, menuStyle, backgroundColor))
+        val childListener: (View) -> Unit = { view -> setItemSelected(view.id) }
+
+        removeAllViews()
+
+        menu.items.forEach {
+            createMenuItem()
+                .apply {
+                    bind(it)
+
+                    setOnClickListener(childListener)
+                }
+                .also(::addView)
+        }
+
+        when (orientationMode) {
+            MenuOrientation.HORIZONTAL -> getHorizontalFlow()
+            MenuOrientation.VERTICAL -> getVerticalFlow()
+        }.apply { referencedIds = menu.items.map { it.id }.toIntArray() }
+            .also(::addView)
+    }
+
+
+
     /**
      * Set the menu orientation
      *
