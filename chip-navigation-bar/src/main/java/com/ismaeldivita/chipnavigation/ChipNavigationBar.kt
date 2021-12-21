@@ -1,6 +1,7 @@
 package com.ismaeldivita.chipnavigation
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
 import android.transition.TransitionManager
@@ -78,7 +79,7 @@ class ChipNavigationBar @JvmOverloads constructor(
     fun setMenuResource(@MenuRes menuRes: Int ) {
         this.menuRes = menuRes
 
-        val menu = (MenuParser(context).parse(menuRes, menuStyle))
+        val menu = (MenuParser(context).parse(menuRes, menuStyle, Color.parseColor("#000000")))
         val childListener: (View) -> Unit = { view -> setItemSelected(view.id) }
 
         removeAllViews()
@@ -101,30 +102,6 @@ class ChipNavigationBar @JvmOverloads constructor(
     }
 
 
-    fun setMenuResource(@MenuRes menuRes: Int,  backgroundColor: Int ) {
-        this.menuRes = menuRes
-
-        val menu = (MenuParser(context).parse(menuRes, menuStyle))
-        val childListener: (View) -> Unit = { view -> setItemSelected(view.id) }
-
-        removeAllViews()
-
-        menu.items.forEach {
-            createMenuItem()
-                .apply {
-                    bind(it)
-                    it.backgroundColor = backgroundColor
-                    setOnClickListener(childListener)
-                }
-                .also(::addView)
-        }
-
-        when (orientationMode) {
-            MenuOrientation.HORIZONTAL -> getHorizontalFlow()
-            MenuOrientation.VERTICAL -> getVerticalFlow()
-        }.apply { referencedIds = menu.items.map { it.id }.toIntArray() }
-            .also(::addView)
-    }
 
     /**
      * Set the menu orientation

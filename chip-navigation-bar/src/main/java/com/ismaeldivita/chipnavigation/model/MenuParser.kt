@@ -21,14 +21,14 @@ internal class MenuParser(private val context: Context) {
         const val XML_MENU_ITEM_TAG = "item"
     }
 
-    fun parse(@MenuRes menuRes: Int, menuStyle: MenuStyle): Menu {
+    fun parse(@MenuRes menuRes: Int, menuStyle: MenuStyle,backgroundColor: Int): Menu {
         @SuppressLint("ResourceType")
         val parser = context.resources.getLayout(menuRes)
         val attrs = Xml.asAttributeSet(parser)
 
         skipMenuTagStart(parser)
 
-        return parseMenu(parser, attrs, menuStyle)
+        return parseMenu(parser, attrs, menuStyle,backgroundColor)
     }
 
     private fun skipMenuTagStart(parser: XmlResourceParser) {
@@ -46,7 +46,8 @@ internal class MenuParser(private val context: Context) {
     private fun parseMenu(
         parser: XmlResourceParser,
         attrs: AttributeSet,
-        menuStyle: MenuStyle
+        menuStyle: MenuStyle,
+        backgroundColor: Int
     ): Menu {
         val items = mutableListOf<MenuItem>()
         var eventType = parser.eventType
@@ -56,7 +57,7 @@ internal class MenuParser(private val context: Context) {
             val name = parser.name
             when {
                 eventType == START_TAG && name == XML_MENU_ITEM_TAG -> {
-                    val item = parseMenuItem(attrs, menuStyle)
+                    val item = parseMenuItem(attrs, menuStyle,backgroundColor)
                     items.add(item)
                 }
                 eventType == END_TAG && name == XML_MENU_TAG -> isEndOfMenu = true
@@ -68,7 +69,7 @@ internal class MenuParser(private val context: Context) {
         return Menu(items = items)
     }
 
-    private fun parseMenuItem(attrs: AttributeSet, menuStyle: MenuStyle): MenuItem {
+    private fun parseMenuItem(attrs: AttributeSet, menuStyle: MenuStyle, backgroundColor: Int): MenuItem {
         val sAttr = context.obtainStyledAttributes(attrs, R.styleable.ChipMenuItem)
 
         val item = MenuItem(
@@ -80,7 +81,7 @@ internal class MenuParser(private val context: Context) {
             iconColor = readIconActiveColor(sAttr),
             tintMode = readIconTintMode(sAttr),
             textColor = readTextActiveColor(sAttr),
-            backgroundColor = readBackgroundColor(sAttr),
+            backgroundColor =backgroundColor,
             menuStyle = menuStyle
         )
 
