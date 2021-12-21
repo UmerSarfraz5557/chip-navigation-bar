@@ -75,7 +75,7 @@ class ChipNavigationBar @JvmOverloads constructor(
      *
      * @param menuRes Resource ID for an XML layout resource to load
      */
-    fun setMenuResource(@MenuRes menuRes: Int) {
+    fun setMenuResource(@MenuRes menuRes: Int ) {
         this.menuRes = menuRes
 
         val menu = (MenuParser(context).parse(menuRes, menuStyle))
@@ -87,6 +87,33 @@ class ChipNavigationBar @JvmOverloads constructor(
             createMenuItem()
                 .apply {
                     bind(it)
+
+                    setOnClickListener(childListener)
+                }
+                .also(::addView)
+        }
+
+        when (orientationMode) {
+            MenuOrientation.HORIZONTAL -> getHorizontalFlow()
+            MenuOrientation.VERTICAL -> getVerticalFlow()
+        }.apply { referencedIds = menu.items.map { it.id }.toIntArray() }
+            .also(::addView)
+    }
+
+
+    fun setMenuResource(@MenuRes menuRes: Int,  backgroundColor: Int ) {
+        this.menuRes = menuRes
+
+        val menu = (MenuParser(context).parse(menuRes, menuStyle))
+        val childListener: (View) -> Unit = { view -> setItemSelected(view.id) }
+
+        removeAllViews()
+
+        menu.items.forEach {
+            createMenuItem()
+                .apply {
+                    bind(it)
+                    it.backgroundColor = backgroundColor
                     setOnClickListener(childListener)
                 }
                 .also(::addView)
